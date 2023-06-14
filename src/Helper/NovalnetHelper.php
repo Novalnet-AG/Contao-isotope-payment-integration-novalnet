@@ -121,14 +121,14 @@ class NovalnetHelper
            'street'            => $objBillingAddress->street_1,
               'city'              => $objBillingAddress->city,
               'zip'               => $objBillingAddress->postal,
-              'country_code'      => strtoupper($objBillingAddress->country),
+              'country_code'      => strtoupper($objBillingAddress->country ?? ''),
         );
 
         $request['customer']['shipping'] = array(
             'street'            => $objShippingAddress->street_1,
               'city'              => $objShippingAddress->city,
               'zip'               => $objShippingAddress->postal,
-              'country_code'      => strtoupper($objShippingAddress->country),
+              'country_code'      => strtoupper($objShippingAddress->country ?? ''),
         );
         if ($request['customer']['billing'] == $request['customer']['shipping']) {
             $request['customer']['shipping'] = array(
