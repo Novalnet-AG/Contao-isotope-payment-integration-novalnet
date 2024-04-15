@@ -46,7 +46,7 @@ Easy installation of Novalnet Payment Bundle for Contao-Isotope will be done thr
 See our License Agreement at: <a href="https://www.novalnet.com/payment-plugins/free/license"> https://www.novalnet.com/payment-plugins/free/license </a>
 
 ## Documentation & Support
-For more information about the Magento 2 Payment Integration by Novalnet, please get in touch with us: <a href="mailto:sales@novalnet.de"> sales@novalnet.de </a> or +49 89 9230683-20<br>
+For more information about the Contao isotope Payment Integration by Novalnet, please get in touch with us: <a href="mailto:sales@novalnet.de"> sales@novalnet.de </a> or +49 89 9230683-20<br>
 
 Novalnet AG<br>
 Zahlungsinstitut (ZAG)<br>
