@@ -147,7 +147,7 @@ class NovalnetWebHook
 
             $this->receivedAmount = sprintf('%0.2f', $this->eventData['transaction']['amount'] / 100);
 
-            $this->orderId  = $this->eventData['transaction']['order_no'] ? $this->eventData['transaction']['order_no'] : $this->orderReference['order_no'];
+            $this->orderId  = ($this->eventData['transaction']['order_no'] ?? null) ? $this->eventData['transaction']['order_no'] : $this->orderReference['order_no'];
 
             switch ($this->eventType) {
                 case 'PAYMENT':
@@ -204,9 +204,9 @@ class NovalnetWebHook
         $this->validateChecksum();
 
         // Validate TID's from the event data
-        if (!preg_match('/^\d{17}$/', (string) $this->eventData['event']['tid'])) {
+        if (!preg_match('/^\d{17}$/', (string) ($this->eventData['event']['tid'] ?? null))) {
             $this->displayMessage(['message' => "Invalid event TID: " . $this->eventData['event']['tid'] . " received for the event(". $this->eventData['event']['type'] .")"]);
-        } elseif ($this->eventData['event']['parent_tid'] && !preg_match('/^\d{17}$/', (string) $this->eventData['event']['parent_tid'])) {
+        } elseif (($this->eventData['event']['parent_tid'] ?? null) && !preg_match('/^\d{17}$/', (string) $this->eventData['event']['parent_tid'])) {
             $this->displayMessage(['message' => "Invalid event TID: " . $this->eventData['event']['parent_tid'] . " received for the event(". $this->eventData['event']['type'] .")"]);
         }
     }
@@ -247,11 +247,16 @@ class NovalnetWebHook
     {
         $paymentData = \Database::getInstance()->prepare("SELECT document_number, payment_data FROM tl_iso_product_collection WHERE id=?")->execute($order->getId());
 
-        $unSerializeData = json_decode($paymentData->payment_data, true);
-        $unSerializeData['order_no'] = $paymentData->document_number;
-        $responseOrderNo = $this->eventData['transaction']['order_no'];
+        try {
+            $unSerializeData = json_decode((string) $paymentData->payment_data, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            $unSerializeData = [];
+        }
 
-        if (!empty($responseOrderNo) && ($paymentData->document_number != $responseOrderNo)) {
+        $unSerializeData['order_no'] = $order->getDocumentNumber() ?: $order->getId();
+        $responseOrderNo = $this->eventData['transaction']['order_no'] ?? null;
+
+        if (!empty($responseOrderNo) && ($unSerializeData['order_no'] != $responseOrderNo)) {
             $this->displayMessage(['message' => "Order reference not matching"]);
         }
 
